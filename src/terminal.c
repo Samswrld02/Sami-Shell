@@ -5,12 +5,14 @@
 #include <signal.h>
 #include <unistd.h>
 #include "vector.h"
+#include <sys/wait.h>
 
 #define MAX_BUF 1024
 
 static vector* v  = NULL;
 
 void handleExit(int sig);
+void handleProcess(pid_t* pid);
 
 void start_terminal(int args, char **argv) {
     int number_of_args = args;
@@ -30,11 +32,36 @@ void start_terminal(int args, char **argv) {
         // create substring 
         createSubstring(v, buff, getStringLength(buff), ' ');
 
-        for (int i = 0; i < v->length; i++) {
-             printf("%s ", v->data[i]);
-        }
-        printf("\n");
+        // for (int i = 0; i < v->length; i++) {
+        //      printf("%s ", v->data[i]);
+        // }
+        // printf("\n");
 
+        // fork start child process
+        pid_t pid = fork();
+
+        handleProcess(&pid);
+    }
+}
+
+// handle the logic for executing commands, via childprocesses
+void handleProcess(pid_t* pid) {
+
+    char** args = {"ls", "-l", NULL};
+    int status;
+    if (*pid < 0) {
+        perror("process couldnt be spawned");
+
+    }
+    else if (*pid == 0) {
+        printf(v->data[0]);
+        if (strcmp(v->data[0], "ls")) {
+            execv("/bin/ls", args);
+        }
+
+    }
+    else{
+        waitpid(*pid, &status, WCONTINUED);
     }
 }
 
