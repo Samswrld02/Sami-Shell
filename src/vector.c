@@ -33,6 +33,15 @@ void vectorAppend(vector* v, char* string) {
     v->length++;
 }
 
+// destructor for vector struct
+void destroyVector(vector** v) {
+    free((*v)->data);
+    free(*v);
+
+    // set pointer to null to prevent memoryleaks
+    *v = NULL;
+}
+
 
 
 

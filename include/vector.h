@@ -10,5 +10,6 @@ typedef struct {
 vector* newVector();
 
 void vectorAppend(vector* v, char* string);
+void destroyVector(vector** v);
 
 #endif
