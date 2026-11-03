@@ -3,6 +3,8 @@
 
 void start_terminal(int args, char **argv);
 
+void handleExit(int sig);
+
 typedef struct {
     char* args;
     int length;

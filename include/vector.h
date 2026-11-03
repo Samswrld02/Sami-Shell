@@ -11,5 +11,6 @@ vector* newVector();
 
 void vectorAppend(vector* v, char* string);
 void destroyVector(vector** v);
+void vectorClear(vector* v);
 
 #endif
