@@ -21,7 +21,7 @@ vector* newVector() {
 }
 
 void vectorClear(vector* v) {
-    memset(v->data, 0, v->capacity);
+    memset(v->data, 0, (v->capacity * sizeof(char*)));
 }
 
 // create a string vector

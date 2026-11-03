@@ -69,7 +69,7 @@ CommandType stringToCommand(char* str) {
 }
 
 void handleCommand(char* str, char** args) {
-    execvp(str, args);
+    if (execvp(str, args) == -1) perror("error");
 }
 
 // takes in the argument list
@@ -91,15 +91,12 @@ void handleProcess(vector* v) {
         case (COMMAND_SAMFETCH):
             handleSamfetch();
             break;
-        case (COMMAND_CD):
-            
-            break;
         case (COMMAND_UNKNOWN):
             printf("Unknown Command\n");
             break;
-        case (COMMAND_EXIT):
-            handleExit(2);
+        default:
             break;
+      
     }
 }
 
