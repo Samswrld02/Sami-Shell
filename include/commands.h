@@ -9,6 +9,7 @@ typedef enum {
     COMMAND_UNKNOWN,
     COMMAND_EXIT,
     COMMAND_CD,
+    COMMAND_BINARY
 } CommandType;
 
 CommandType stringToCommand(char* str);

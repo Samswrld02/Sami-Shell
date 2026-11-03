@@ -1,6 +1,7 @@
 #include "terminal.h"
 #include "customString.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <signal.h>
 #include <unistd.h>
@@ -64,11 +65,13 @@ CommandType stringToCommand(char* str) {
     if (strcmp(str, "samfetch") == 0) return COMMAND_SAMFETCH;
     if (strcmp(str, "exit") == 0 ) return COMMAND_EXIT;
     if (strcmp(str, "cd") == 0 ) return COMMAND_CD;
+    if (checkBinary(str) == 1) return COMMAND_BINARY;
 
     return COMMAND_UNKNOWN;
 }
 
 void handleCommand(char* str, char** args) {
+    fflush(stdout);
     if (execvp(str, args) == -1) perror("error");
 }
 
@@ -94,6 +97,9 @@ void handleProcess(vector* v) {
         case (COMMAND_UNKNOWN):
             printf("Unknown Command\n");
             break;
+        case (COMMAND_BINARY):
+            // handleCommand(v->data[0], v->data);
+            handleCommand(v->data[0], v->data);
         default:
             break;
       

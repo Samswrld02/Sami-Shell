@@ -3,11 +3,6 @@
 #include <unistd.h>
 #include "terminal.h"
 
-// void _handleExit() {
-//     printf("Goodbye");
-// }
-
-
 
 void handleCommandsParent(char* str, char** args) {
     CommandType command = stringToCommand(str);
