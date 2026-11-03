@@ -12,7 +12,6 @@
 
 static vector* v  = NULL;
 
-void handleExit(int sig);
 void handleProcess(vector* v);
 void handleSamfetch();
 

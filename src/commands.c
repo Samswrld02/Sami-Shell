@@ -1,10 +1,11 @@
 #include "commands.h"
 #include <stdio.h>
 #include <unistd.h>
+#include "terminal.h"
 
-void _handleExit() {
-    printf("Goodbye");
-}
+// void _handleExit() {
+//     printf("Goodbye");
+// }
 
 
 
@@ -34,7 +35,7 @@ void handleCommandsParent(char* str, char** args) {
             printf("Unknown Command\n");
             break;
         case (COMMAND_EXIT):
-            // handleExit(2);
+            handleExit(2);
             break;
     }
 
