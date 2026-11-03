@@ -1,5 +1,7 @@
 #include "vector.h"
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 #define CAPACITY 50
 
 // vector constructor
@@ -16,6 +18,10 @@ vector* newVector() {
    v->capacity = CAPACITY;
 
    return v;
+}
+
+void vectorClear(vector* v) {
+    memset(v->data, 0, v->capacity);
 }
 
 // create a string vector
