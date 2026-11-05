@@ -4,7 +4,7 @@
 #include "terminal.h"
 
 
-void handleCommandsParent(char* str, char** args) {
+void handleCommandsParent(char* str, char** args, hash_table* ht) {
     CommandType command = stringToCommand(str);
 
      //get string 

@@ -1,0 +1,4 @@
+ls=/bin/ls
+pwd=/bin/pwd
+clear=/usr/bin/clear
+cat=/bin/cat
