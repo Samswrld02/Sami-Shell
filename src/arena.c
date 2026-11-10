@@ -12,19 +12,39 @@ typedef struct Arena {
 } Arena;
 
 // create arena
-Arena initArena(size_t capacity) {
+Arena* initArena(size_t capacity) {
 
     // allocate data
    void* data = malloc(sizeof(uint8_t) * capacity);
 
-    Arena arena = {
-        .capacity = capacity,
-        .size = 0,
-        .data = data,
-        .next = NULL,
-    };
+   Arena* arena = malloc(sizeof(Arena));
+
+   arena->capacity = capacity;
+   arena->size = 0;
+   arena->data = data;
+   arena->next = NULL;
 
     return arena;
+}
+
+// reset starting address
+void resetArena(Arena* arena) {
+    arena->size = 0;
+}
+
+// free arena
+void freeArena(Arena* arena) {
+    // loop through all linked lists
+
+    Arena* current = arena;
+
+    while (current != NULL) {
+        Arena* next = current->next;
+        free(current->data);
+        free(current);
+
+        current = next;
+    }
 }
 
 void arenaSize(Arena* arena) {
@@ -32,52 +52,24 @@ void arenaSize(Arena* arena) {
 }
 
 void* allocateData(Arena* arena, size_t size) {
-    // check if space, if not return
-    if ((size + arena->size) > arena->capacity) {
-        perror("exceeded capacity");
-        exit(EXIT_FAILURE);
+    while ((size + arena->size) > arena->capacity) {
+        // create new arena if no node linked
+        if (arena->next == NULL) {
+            // create new node with double the capacity
+            Arena* next = initArena(arena->capacity * 2);
+
+            arena->next = next;    
+        }
+
+        // set new arena to be evaluated
+        arena = arena->next;
     }
 
-
-    // return pointer to mem block
+    // return pointer to mem block + offset thats been alligned
     void* p = arena->data + arena->size;
 
-     // change size
-    arena->size = arena->size + size;
+    // set offset with allignment of 8 -> add max remainder and remove max remainder bits so bits 1,2,4 -> max remainder -> 7 in binary = 0000 0111 -> 1111 1000 mask
+    arena->size = arena->size + ((size + 7) & ~7);
 
     return p;
-}
-
-
-int main(void) {
-
-    Arena arena = initArena(16);
-
-    char* test = "hello worssddd";
-    
-    char* p = allocateData(&arena, strlen(test) + 1);
-
-    memcpy(p, test, strlen(test) + 1);
-
-    arenaSize(&arena);
-
-    printf("string is %s\n", p);
-
-    int smallint = 2000;
-    int* p1 = allocateData(&arena, sizeof(int));
-
-    memcpy(p1, &smallint, sizeof(smallint));
-
-    
-
-   
-
-    printf("%s\n", p);
-
-    
-    
-    arenaSize(&arena);
-    arenaSize(&arena);
-
-    return 0;
 }
