@@ -1,15 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-
-// arena struct
-typedef struct Arena {
-    size_t size;
-    size_t capacity;
-    u_int8_t *data;
-    struct Arena* next;
-} Arena;
+#include <arena.h>
 
 // create arena
 Arena* initArena(size_t capacity) {

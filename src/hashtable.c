@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "hashtable.h"
+#include "arena.h"
 
 //hash function
 int hash(char* string) {
@@ -18,14 +19,17 @@ int hash(char* string) {
 
 
 hash_table* newHt() {
+
+    Arena* arena = initArena(1000);
     
     // allocae table on the heap
-    hash_table* p = malloc(sizeof(hash_table));
+    hash_table* p = allocateData(arena, sizeof(hash_table));
 
     if (p == NULL) return NULL;
 
     // allocate buckets 
-    p->buckets = malloc(sizeof(bucket*) * TABLE_SIZE);
+    p->buckets = allocateData(arena, sizeof(bucket*) * TABLE_SIZE);
+    // p->buckets = malloc(sizeof(bucket*) * TABLE_SIZE);
 
     if (p->buckets == NULL) {
         free(p);
