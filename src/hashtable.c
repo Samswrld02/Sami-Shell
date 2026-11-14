@@ -18,23 +18,12 @@ int hash(char* string) {
 }
 
 
-hash_table* newHt() {
-
-    Arena* arena = initArena(1000);
-    
-    // allocae table on the heap
+hash_table* newHt(Arena* arena) {    
+    // allocate table on the heap
     hash_table* p = allocateData(arena, sizeof(hash_table));
-
-    if (p == NULL) return NULL;
 
     // allocate buckets 
     p->buckets = allocateData(arena, sizeof(bucket*) * TABLE_SIZE);
-    // p->buckets = malloc(sizeof(bucket*) * TABLE_SIZE);
-
-    if (p->buckets == NULL) {
-        free(p);
-        return NULL;
-    }
 
     // set all buckets pointers to null
     for (int i = 0; i < TABLE_SIZE; i++) {
@@ -44,14 +33,15 @@ hash_table* newHt() {
     return  p;
 }
 
-void put(hash_table* ht,  char* key, char* value) {
+void put(Arena* arena, hash_table* ht,  char* key, char* value) {
 
     int index = hash(key);
     // printf("index: %i", index);
 
     if (ht->buckets[index] == NULL) {
         // printf("bucket is free");
-        bucket* node = malloc(sizeof(bucket));
+        bucket* node = allocateData(arena, sizeof(bucket));
+        // bucket* node = malloc(sizeof(bucket));
         node->next = NULL;
         ht->buckets[index] = node;
         ht->buckets[index]->key = key;

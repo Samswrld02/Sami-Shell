@@ -15,7 +15,7 @@ typedef enum {
 
 CommandType stringToCommand(char* str);
 
-void handleCommandsParent(char* str, char** args, hash_table* ht);
+int handleCommandsParent(Arena* arena, char* str, char** args);
 // this is for external commands
 void handleCommand(char* str, char** args);
 

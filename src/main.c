@@ -2,8 +2,8 @@
 #include "terminal.h"
 
 
-int main(int arg, char** argv) {
-    start_terminal(arg, argv);
+int main() {
+    start_terminal();
     
     return 0;
 }

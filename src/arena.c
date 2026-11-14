@@ -7,14 +7,25 @@
 Arena* initArena(size_t capacity) {
 
     // allocate data
-   void* data = malloc(sizeof(uint8_t) * capacity);
+    void* data = malloc(sizeof(uint8_t) * capacity);
 
-   Arena* arena = malloc(sizeof(Arena));
+    // check if allocation succeeded
+    if (data == NULL) {
+        return NULL;
+    }
 
-   arena->capacity = capacity;
-   arena->size = 0;
-   arena->data = data;
-   arena->next = NULL;
+    Arena* arena = malloc(sizeof(Arena));
+
+    if (arena == NULL) {
+        // free earlier allocated data on fail
+        free(data);
+    return NULL;
+    }
+
+    arena->capacity = capacity;
+    arena->size = 0;
+    arena->data = data;
+    arena->next = NULL;
 
     return arena;
 }
@@ -49,6 +60,11 @@ void* allocateData(Arena* arena, size_t size) {
         if (arena->next == NULL) {
             // create new node with double the capacity
             Arena* next = initArena(arena->capacity * 2);
+
+            if (next == NULL) {
+                printf("arena allocation failed, ran out of memory!");
+                exit(EXIT_FAILURE);
+            }
 
             arena->next = next;    
         }

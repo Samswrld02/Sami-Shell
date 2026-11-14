@@ -1,5 +1,6 @@
 #ifndef VECTOR_H
 #define VECTOR_H 
+#include "arena.h"
 
 typedef struct {
     char** data;
@@ -7,7 +8,7 @@ typedef struct {
     int capacity;
 } vector;
 
-vector* newVector();
+vector* newVector(Arena* arena);
 
 void vectorAppend(vector* v, char* string);
 void destroyVector(vector** v);

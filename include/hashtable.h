@@ -5,6 +5,7 @@
 #define TABLE_SIZE 10
 
 #include <stdbool.h>
+#include "arena.h"
 
 typedef struct bucket{
     char* key;
@@ -27,8 +28,8 @@ typedef struct response {
 int hash(char* string);
 
 int hash(char* string);
-hash_table* newHt();
-void put(hash_table* ht,  char* key, char* value);
+hash_table* newHt(Arena* arena);
+void put(Arena* arena, hash_table* ht,  char* key, char* value);
 char* getValue(hash_table* ht, char* key);
 
 

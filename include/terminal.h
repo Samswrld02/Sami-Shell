@@ -4,8 +4,8 @@
 #include "hashtable.h"
 #include "vector.h"
 
-void start_terminal(int args, char **argv);
-hash_table* loadPath();
+void start_terminal();
+void loadPath(Arena* arena, hash_table* ht);
 
 void handleProcess(vector* v, hash_table* ht);
 
