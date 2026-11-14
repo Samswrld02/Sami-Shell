@@ -1,5 +1,6 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
+#include "hashtable.h"
 
 typedef enum {
     COMMAND_LS,
@@ -9,11 +10,12 @@ typedef enum {
     COMMAND_UNKNOWN,
     COMMAND_EXIT,
     COMMAND_CD,
+    COMMAND_BINARY
 } CommandType;
 
 CommandType stringToCommand(char* str);
 
-void handleCommandsParent(char* str, char** args);
+int handleCommandsParent(Arena* arena, char* str, char** args);
 // this is for external commands
 void handleCommand(char* str, char** args);
 

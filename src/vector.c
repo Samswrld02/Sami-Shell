@@ -1,15 +1,16 @@
 #include "vector.h"
+#include "arena.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #define CAPACITY 50
 
 // vector constructor
-vector* newVector() {
-   vector* v = malloc(sizeof(vector)); 
+vector* newVector(Arena* arena) {
+   vector* v = allocateData(arena, sizeof(vector)); 
 
    // create capacity, holds pointers to strings
-   v->data = malloc(CAPACITY * sizeof(char*));
+   v->data = allocateData(arena, sizeof(char*));
 
    //set starting length
    v->length = 0;

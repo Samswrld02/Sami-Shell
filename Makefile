@@ -20,4 +20,4 @@ clean:
 	@echo "everything has been cleaned"
 
 run: all
-	./$(TARGET) $(ARGS)
+	./$(TARGET) $(ARGS) 

@@ -1,5 +1,6 @@
 #include "customString.h"
 #include "vector.h"
+#include <unistd.h>
 
 // create substring based on delimiter
 void createSubstring(vector* v, char* string, int length,  char delimiter){
@@ -26,4 +27,12 @@ int getStringLength(char* string) {
     }
 
     return i;
+}
+
+int checkBinary(char* string) {
+    // X_OK checks for execute permission
+    if (access(string, X_OK) == 0) {
+        return 1; // File is executable
+    }
+    return 0; // File does not exist or is not executable
 }

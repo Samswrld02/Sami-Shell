@@ -1,25 +1,39 @@
 #include "terminal.h"
 #include "customString.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <signal.h>
 #include <unistd.h>
 #include "vector.h"
 #include "commands.h"
 #include <sys/wait.h>
+#include <stdbool.h>
+#include "hashtable.h"
+#include "arena.h"
 
 #define MAX_BUF 1024
 
-static vector* v  = NULL;
+static vector* v = NULL;
+static Arena* arena = NULL;
 
-void handleProcess(vector* v);
 void handleSamfetch();
 
-void start_terminal(int args, char **argv) {
-    int number_of_args = args;
+void start_terminal() {
+
+    arena = initArena(1024);
+    if (arena == NULL) {
+        printf("arena memory allocation failed !");
+        exit(EXIT_FAILURE);
+    }
+
+    hash_table* ht = newHt(arena);
+    loadPath(arena, ht);
+
     char buff[MAX_BUF];
 
-    v = newVector();
+    v = newVector(arena);
+
     signal(SIGINT, handleExit);
 
     while (1) {
@@ -29,17 +43,23 @@ void start_terminal(int args, char **argv) {
         // clear any residual data causing bugs
         vectorClear(v);
 
-        printf("Sami-shell> ");
+        printf("\nSami-shell> ");
+        fflush(stdout);
 
-        // take in charachters from stdin into buffer
+        // take in characters from stdin into buffer
         fgets(buff, MAX_BUF, stdin);
     
         // create substring 
         createSubstring(v, buff, getStringLength(buff), ' ');
 
         // check for parent process needed commands, (cd etc..)
-        handleCommandsParent(v->data[0], v->data);
+        int ok = handleCommandsParent(arena, v->data[0], v->data);
 
+        // skip forking if command is parent only
+        if (ok) {
+            continue;
+        }
+       
         // fork start child process
         pid_t pid = fork();
         
@@ -47,11 +67,13 @@ void start_terminal(int args, char **argv) {
             perror("process couldnt be spawned");
         }
         else if (pid == 0) {
-            handleProcess(v);
+            handleProcess(v, ht);
             break;
         }
         else{
-            wait(&pid);
+            waitpid(pid, NULL, 0);
+            // reset arena for next command/ request
+            resetArena(arena);
         }
     }
 }
@@ -64,39 +86,76 @@ CommandType stringToCommand(char* str) {
     if (strcmp(str, "samfetch") == 0) return COMMAND_SAMFETCH;
     if (strcmp(str, "exit") == 0 ) return COMMAND_EXIT;
     if (strcmp(str, "cd") == 0 ) return COMMAND_CD;
+    if (checkBinary(str) == 1) return COMMAND_BINARY;
 
     return COMMAND_UNKNOWN;
 }
 
 void handleCommand(char* str, char** args) {
+    fflush(stdout);
     if (execvp(str, args) == -1) perror("error");
 }
 
 // takes in the argument list
-void handleProcess(vector* v) {
+void handleProcess(vector* v, hash_table* ht) {
     // get the command enum
     CommandType command = stringToCommand(v->data[0]);
 
-    //get string 
-    switch (command) {
-        case (COMMAND_LS):
-            handleCommand(v->data[0], v->data);
-            break;
-        case (COMMAND_PWD):
-            handleCommand(v->data[0], v->data);
-            break;
-        case (COMMAND_CLEAR):
-            handleCommand(v->data[0], v->data);
-            break;
-        case (COMMAND_SAMFETCH):
+    char* commandV;
+
+    if (commandV = getValue(ht, v->data[0])) {
+        if (execvp(commandV, v->data) == -1) perror("error");
+    } else {
+        if (command == COMMAND_BINARY) {
+            execvp(v->data[0], v->data);
+        }
+        if (command == COMMAND_SAMFETCH) {
             handleSamfetch();
-            break;
-        case (COMMAND_UNKNOWN):
-            printf("Unknown Command\n");
-            break;
-        default:
-            break;
-      
+        } else {
+            perror("Error: command not found");
+        }
+       
+    }
+}
+
+// loading path 
+void loadPath( Arena* arena, hash_table* ht) {
+    // buffer for loading in file
+    char* buffer = allocateData(arena, sizeof(char) * 100);
+
+    FILE* fptr;
+
+    fptr = fopen("path.txt", "r");
+    if (fptr == NULL) {
+        printf("file not openend");
+        exit(EXIT_FAILURE);
+    }
+
+
+    char* path;
+    // load in path from file and tokenise
+    while ((path = fgets(buffer, (sizeof(char) * 100), fptr)) != NULL) {
+         // Capture key
+        char* key = strtok(path, "=");
+        
+        // capture value
+        char* value = strtok(NULL, "\r\n"); 
+
+        // if both available
+        if (key != NULL && value != NULL) {
+
+            // allocate data on the heap for the strings
+            char* keyH = allocateData(arena, strlen(key) + 1);
+            char* valueH = allocateData(arena, strlen(value) + 1);
+
+            // printf("\nSleutel: %s -> Pad: %s\n", key, value);
+
+            strcpy(keyH, key);
+            strcpy(valueH, value);
+            
+            // store in ht
+            put(arena, ht, keyH, valueH);
+        }
     }
 }
 
@@ -114,8 +173,8 @@ void handleExit(int sig) {
     char msg[] = "\ngoodbye from sami :)\n";
     write(STDOUT_FILENO, msg, sizeof(msg));
 
-    // set pointer to null again on stack
-    destroyVector(&v);
-
+    // free arena allocated memory
+    freeArena(arena);
+   
     _exit(sig);
 }
